@@ -1,5 +1,5 @@
 ARG JITSI_REPO=jitsi
-ARG BASE_TAG=latest
+ARG BASE_TAG=stable
 FROM ${JITSI_REPO}/base:${BASE_TAG}
 
 LABEL org.opencontainers.image.title="Jitsi Meet"
@@ -16,6 +16,9 @@ RUN apt-dpkg-wrap apt-get update && \
     mv /usr/share/jitsi-meet/interface_config.js /defaults && \
     rm -f /etc/nginx/conf.d/default.conf && \
     apt-cleanup
+
+COPY jitsi-meet/libs /usr/share/jitsi-meet/libs
+COPY jitsi-meet/lang /usr/share/jitsi-meet/lang
 
 EXPOSE 80 443
 
