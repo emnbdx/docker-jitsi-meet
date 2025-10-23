@@ -85,6 +85,10 @@ asap_accepted_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ISSU
 asap_accepted_audiences = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_AUDIENCES | compact) }}" }
 {{ end }}
 
+{{ if and $ENABLE_AUTH (or (eq $PROSODY_AUTH_TYPE "jwt") (eq $PROSODY_AUTH_TYPE "hybrid_matrix_token")) .Env.JWT_ACCEPTED_ALLOWNER_ISSUERS }}
+allowner_issuers = { "{{ join "\",\"" (splitList "," .Env.JWT_ACCEPTED_ALLOWNER_ISSUERS | compact) }}" }
+{{ end }}
+
 consider_bosh_secure = true;
 consider_websocket_secure = true;
 
@@ -312,9 +316,6 @@ Component "{{ $XMPP_MUC_DOMAIN }}" "muc"
         {{ if and $ENABLE_AUTH (eq $PROSODY_AUTH_TYPE "hybrid_matrix_token") $MATRIX_LOBBY_BYPASS -}}
         "matrix_lobby_bypass";
         {{ end -}}
-        {{ if not $DISABLE_POLLS -}}
-        "polls";
-        {{ end -}}
         {{ if $ENABLE_SUBDOMAINS -}}
         "muc_domain_mapper";
         {{ end -}}
@@ -444,9 +445,6 @@ Component "breakout.{{ $XMPP_DOMAIN }}" "muc"
     modules_enabled = {
         "muc_hide_all";
         "muc_meeting_id";
-        {{ if not $DISABLE_POLLS -}}
-        "polls";
-        {{ end -}}
         {{ if $ENABLE_RATE_LIMITS -}}
         "muc_rate_limit";
         {{ end -}}
@@ -466,3 +464,7 @@ Component "visitors.{{ $XMPP_DOMAIN }}" "visitors_component"
     auto_allow_visitor_promotion = true
     always_visitors_enabled = true
 {{ end }}
+
+{{ if not $DISABLE_POLLS -}}
+Component "polls.{{ $XMPP_DOMAIN }}" "polls_component"
+{{ end -}}
