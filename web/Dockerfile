@@ -32,14 +32,10 @@ RUN \
   chown s6:s6 /storage && \
   apt-cleanup
 
-<<<<<<< HEAD
 COPY jitsi-meet/libs /usr/share/jitsi-meet/libs
 COPY jitsi-meet/lang /usr/share/jitsi-meet/lang
 
 EXPOSE 80 443
-=======
-EXPOSE 8000 8443
->>>>>>> stable-11146-2
 
 VOLUME ["/config", "/usr/share/jitsi-meet/transcripts"]
 
