@@ -1,8 +1,12 @@
 services:
     # SIP gateway (audio)
     jigasi:
-        image: jitsi/jigasi:${JITSI_IMAGE_VERSION:-stable-11031}
+        image: ${JITSI_IMAGE_REPO:-ghcr.io/jitsi}/jigasi:${JITSI_IMAGE_VERSION:-stable-11146-2}
         restart: ${RESTART_POLICY:-unless-stopped}
+        read_only: true
+        tmpfs:
+            - /run:size=16M,mode=1750,exec
+            - /tmp:size=128M,mode=1777,noexec
         ports:
             - '${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}:${JIGASI_PORT_MIN:-20000}-${JIGASI_PORT_MAX:-20050}/udp'
         volumes:

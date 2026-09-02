@@ -2,6 +2,7 @@
 {{ $C2S_REQUIRE_ENCRYPTION := .Env.PROSODY_C2S_REQUIRE_ENCRYPTION | default "1" | toBool -}}
 {{ $DISABLE_POLLS := .Env.DISABLE_POLLS | default "false" | toBool -}}
 {{ $ENABLE_APP_SECRET := .Env.JWT_APP_SECRET | default "false" | toBool -}}
+{{ $ENABLE_AUDIO_TRANSLATION := .Env.ENABLE_AUDIO_TRANSLATION | default "0" | toBool -}}
 {{ $ENABLE_AUTH := .Env.ENABLE_AUTH | default "0" | toBool -}}
 {{ $ENABLE_AV_MODERATION := .Env.ENABLE_AV_MODERATION | default "true" | toBool -}}
 {{ $ENABLE_BREAKOUT_ROOMS := .Env.ENABLE_BREAKOUT_ROOMS | default "true" | toBool -}}
@@ -102,6 +103,10 @@ smacks_hibernation_time = 60;
 smacks_max_old_sessions = 1;
 {{ end }}
 
+-- Keep the mod_smacks hibernation queue store in memory; all other stores
+-- fall back to the default "internal" backend.
+storage = { smacks_h = "memory" }
+
 {{ if $ENABLE_JAAS_COMPONENTS }}
 VirtualHost "jigasi.meet.jitsi"
     modules_enabled = {
@@ -169,8 +174,8 @@ VirtualHost "{{ $XMPP_DOMAIN }}"
     authentication = "jitsi-anonymous"
 {{ end }}
     ssl = {
-        key = "/config/certs/{{ $XMPP_DOMAIN }}.key";
-        certificate = "/config/certs/{{ $XMPP_DOMAIN }}.crt";
+        key = "/run/prosody/config/certs/{{ $XMPP_DOMAIN }}.key";
+        certificate = "/run/prosody/config/certs/{{ $XMPP_DOMAIN }}.crt";
     }
     modules_enabled = {
         "bosh";
@@ -261,8 +266,8 @@ VirtualHost "{{ $XMPP_GUEST_DOMAIN }}"
 
 VirtualHost "{{ $XMPP_AUTH_DOMAIN }}"
     ssl = {
-        key = "/config/certs/{{ $XMPP_AUTH_DOMAIN }}.key";
-        certificate = "/config/certs/{{ $XMPP_AUTH_DOMAIN }}.crt";
+        key = "/run/prosody/config/certs/{{ $XMPP_AUTH_DOMAIN }}.key";
+        certificate = "/run/prosody/config/certs/{{ $XMPP_AUTH_DOMAIN }}.crt";
     }
     modules_enabled = {
         "limits_exception";
@@ -478,6 +483,10 @@ Component "metadata.{{ $XMPP_DOMAIN }}" "room_metadata_component"
     muc_component = "{{ $XMPP_MUC_DOMAIN }}"
     breakout_rooms_component = "breakout.{{ $XMPP_DOMAIN }}"
 
+{{ if $ENABLE_AUDIO_TRANSLATION }}
+Component "audiotranslation.{{ $XMPP_DOMAIN }}" "audio_translation_component"
+    muc_component = "{{ $XMPP_MUC_DOMAIN }}"
+{{ end }}
 
 {{ if $ENABLE_VISITORS }}
 Component "visitors.{{ $XMPP_DOMAIN }}" "visitors_component"
