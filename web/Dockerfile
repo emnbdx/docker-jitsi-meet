@@ -1,5 +1,5 @@
 ARG JITSI_REPO=ghcr.io/jitsi
-ARG BASE_TAG=latest
+ARG BASE_TAG=stable
 FROM ${JITSI_REPO}/base:${BASE_TAG}
 
 USER root
@@ -35,7 +35,7 @@ RUN \
 COPY jitsi-meet/libs /usr/share/jitsi-meet/libs
 COPY jitsi-meet/lang /usr/share/jitsi-meet/lang
 
-EXPOSE 80 443
+EXPOSE 8000 8443
 
 VOLUME ["/config", "/usr/share/jitsi-meet/transcripts"]
 
